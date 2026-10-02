@@ -46,31 +46,102 @@
         #formContainer.show{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1)}
         .form-control,.form-select{background:#FCE4EC;border:2px solid #F48FB1;color:#880E4F;border-radius:8px;padding:.6rem .9rem}
         .form-control:focus,.form-select:focus{border-color:#E91E63;box-shadow:0 0 0 4px rgba(233,30,99,.15)}
+
+        .box{position:relative;z-index:2;overflow:hidden;animation:pop .7s cubic-bezier(.2,1.3,.4,1) both}
+        .box::before{content:"";position:absolute;inset:0;border-radius:20px;padding:2px;background:linear-gradient(135deg,#ec4899,#f9a8d4,#ec4899,#c2185b);background-size:300% 300%;animation:borderMove 4s linear infinite;-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+        @keyframes borderMove{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+        @keyframes pop{from{opacity:0;transform:translateY(30px) scale(.92)}to{opacity:1;transform:none}}
+        .badge-top{display:inline-block;background:linear-gradient(135deg,#ec4899,#c2185b);color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:.4rem 1rem;border-radius:50px;margin-bottom:.8rem}
+        .tick{display:block;margin:0 auto .6rem}
+        .tick-c{stroke:#ec4899;stroke-width:3;stroke-dasharray:151;stroke-dashoffset:151;animation:draw .8s .2s forwards}
+        .tick-p{stroke:#ec4899;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:40;stroke-dashoffset:40;animation:draw .5s .9s forwards}
+        @keyframes draw{to{stroke-dashoffset:0}}
+        .step{opacity:0;transform:translateX(-25px);animation:slideIn .6s var(--d) forwards;border-left:4px solid #ec4899}
+        @keyframes slideIn{to{opacity:1;transform:none}}
+        .quote{background:linear-gradient(135deg,#fdf2f8,#fce7f3);border-radius:12px;padding:.8rem 1rem;font-weight:600;font-style:italic;color:#9d174d;font-size:.95rem}
+        .form-btn{position:relative;z-index:2;animation:btnPulse 2.4s infinite}
+        @keyframes btnPulse{0%,100%{box-shadow:0 8px 20px rgba(37,211,102,.3)}50%{box-shadow:0 0 35px rgba(37,211,102,.75)}}
+        .float{position:fixed;bottom:-40px;z-index:1;font-size:1.4rem;opacity:.5;animation:rise linear infinite;pointer-events:none}
+        @keyframes rise{to{transform:translateY(-115vh) rotate(25deg);opacity:0}}
+        #confetti{position:fixed;inset:0;pointer-events:none;z-index:9000}
+        @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important}.float{display:none}}
+
+        body{justify-content:flex-start;padding-top:1.2rem;padding-bottom:2rem}
+        .pic{position:relative;z-index:2;width:100%;max-width:520px;border-radius:16px;box-shadow:var(--shadow);display:block}
+        .sec{position:relative;z-index:2;width:100%;max-width:520px}
+        .st{font-size:1.4rem;font-weight:800;color:#C2185B;text-align:center;margin:1rem 0 .9rem}
+        .sg{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+        .sc{display:flex;gap:.6rem;align-items:flex-start;background:#fff;border-radius:12px;padding:.8rem;box-shadow:var(--shadow)}
+        .sc b{display:block;font-size:.85rem;color:#C2185B}.sc small{font-size:.75rem;color:#555;line-height:1.3;display:block}
+        .sn{width:34px;height:34px;flex-shrink:0;border-radius:50%;background:linear-gradient(135deg,#C2185B,#E91E63);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center}
+        .cs{display:flex;gap:.6rem;align-items:center;background:#fff;border-radius:10px;padding:.7rem;border-left:4px solid #E91E63;box-shadow:var(--shadow)}
+        .cs b{display:block;font-size:1.3rem;color:#C2185B;line-height:1.2}.cs small{display:block;font-size:.72rem;color:#666}
+        .ci{width:42px;height:42px;flex-shrink:0;border-radius:50%;background:linear-gradient(135deg,#C2185B,#E91E63);display:flex;align-items:center;justify-content:center}
+        .cs.big{display:block;text-align:center;border:2px solid #E91E63;height:100%}
+        .cs.big h3{font-size:.95rem;font-weight:800;color:#C2185B;margin-bottom:.5rem}
+        .cs.big b{margin-top:.3rem}
+        .fq{background:#fff;border-radius:10px;box-shadow:var(--shadow);margin-bottom:.6rem;overflow:hidden}
+        .fq summary{padding:.85rem 1rem;font-weight:600;font-size:.9rem;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:.5rem}
+        .fq summary::after{content:"⌄";color:#999}
+        .fq[open] summary{background:linear-gradient(135deg,#FCE4EC,#fff);color:#C2185B}
+        .fq[open] summary::after{content:"⌃"}
+        .fq p{padding:.2rem 1rem 1rem;font-size:.85rem;color:#444;margin:0}
     </style>
 </head>
 <body>
+    <canvas id="confetti"></canvas>
+    <div id="floaters"></div>
+
+    <img src="https://i.ibb.co/4nT50BwZ/8f284a4ec3806f27087e9130cdcdc61a-jpg.jpg" alt="Community" class="pic">
 
     <!-- FORM BUTTON (above Thank You) -->
     <button type="button" class="form-btn" id="openFormBtn">📝 Fill Your Details</button>
 
     <div class="box">
-        <div style="font-size:4rem">🎉</div>
-        <h1 class="h2 gradient-text mb-2">Thank You!</h1>
+        <div class="badge-top">🎊 Welcome to the Community</div>
+        <svg class="tick" viewBox="0 0 52 52" width="90" height="90"><circle class="tick-c" cx="26" cy="26" r="24" fill="none"/><path class="tick-p" fill="none" d="M14 27l8 8 16-17"/></svg>
+        <h1 class="h2 gradient-text mb-2">Thank You! 💖</h1>
         <p class="text-muted mb-4">Thanks for filling in your details. Our team will connect with you within 24 hours. 💖</p>
 
         <div class="mb-4">
-            <div class="step">📋 Your details have been received</div>
-            <div class="step">💬 Our team will message you on WhatsApp</div>
-            <div class="step">🚀 Get your complete roadmap to start earning</div>
+            <div class="step" style="--d:.4s">📋 Your details have been received</div>
+            <div class="step" style="--d:.7s">💬 Our team will message you on WhatsApp</div>
+            <div class="step" style="--d:1s">🚀 Get your complete roadmap to start earning</div>
         </div>
 
-        <div class="d-flex gap-2 justify-content-center flex-wrap">
-            <a href="index.html" class="btn-pink">Back to Home</a>
-            <a href="https://www.instagram.com/faizeenejaz?igsh=OWptZHB2OW1ydWdi" target="_blank" rel="noopener" class="insta">Follow on Instagram</a>
-        </div>
+        <div class="quote">"Empower Women to Empower Themselves" ✨</div>
 
         <p class="mt-4 mb-0 small text-muted">❤️ With Strength & Sincerity, Rahman</p>
     </div>
+
+    <!-- WHAT HAPPENS -->
+    <div class="sec">
+        <h2 class="st">What Happens When You Join?</h2>
+        <div class="sg"><div class="sc"><span class="sn">1</span><div><b>Instant Connection</b><small>Direct access to me</small></div></div><div class="sc"><span class="sn">2</span><div><b>Complete Access</b><small>Proven step-by-step training system</small></div></div><div class="sc"><span class="sn">3</span><div><b>Daily Mentorship</b><small>24/7 support & community access</small></div></div><div class="sc"><span class="sn">4</span><div><b>Start Earning</b><small>Begin from Week 1 confidently</small></div></div></div>
+        <button type="button" class="form-btn mt-3" id="openFormBtn2">🚀 Get Started Now</button>
+    </div>
+
+    <!-- KNOW YOUR COACH -->
+    <div class="sec">
+        <h2 class="st">Know Your Coach</h2>
+        <div class="row g-2 align-items-stretch">
+            <div class="col-6">
+                <div class="cs"><span class="ci">⭐</span><div><b>5+</b><small>Years of Experience</small></div></div>
+                <div class="cs mt-2"><span class="ci">👥</span><div><b>1,000+</b><small>Women Reached</small></div></div>
+            </div>
+            <div class="col-6">
+                <div class="cs big"><h3>🔥 Now it's YOUR time</h3><b>₹1,600,000</b><small>Earned by Women</small><b>300+</b><small>Earning ₹50K–₹1L</small></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="sec">
+        <h2 class="st">Frequently Asked Questions</h2>
+        <details class="fq" open><summary>What kind of work will I be doing?</summary><p>Digital skills: Website Design, Graphics, Editing, Content Creation, Monetization, etc. 100% legitimate.</p></details><details class="fq"><summary>Is this program legitimate & safe?</summary><p>Genuine training. 2000+ women earning consistently. Verify credentials.</p></details><details class="fq"><summary>How much time daily?</summary><p>Just 1-2 hours daily. Flexible for everyone.</p></details><details class="fq"><summary>When will I start earning?</summary><p>Within 1 month. Sustainable income in 1-2 months.</p></details><details class="fq"><summary>Any prior experience needed?</summary><p>No experience needed! Step-by-step guidance provided.</p></details><details class="fq"><summary>What support after joining?</summary><p>Daily mentorship, 24/7 support, weekly calls & women-only community.</p></details><details class="fq"><summary>Any investment required?</summary><p>Nominal fee covers everything. No hidden costs.</p></details><details class="fq"><summary>Can I do this alongside job/studies?</summary><p>Yes! Designed for busy women. Learn in free time.</p></details>
+    </div>
+
+    <img src="https://i.ibb.co/QZLhYNn/cc.jpg" alt="Success" class="pic">
 
     <!-- FORM POPUP -->
     <div class="backdrop" id="backdrop"></div>
@@ -122,6 +193,17 @@
     </div>
 
     <script>
+        /* Confetti + floating hearts */
+        (function(){
+            const c=document.getElementById('confetti'),x=c.getContext('2d');
+            const fit=()=>{c.width=innerWidth;c.height=innerHeight};fit();addEventListener('resize',fit);
+            const cols=['#ec4899','#f9a8d4','#c2185b','#fbbf24','#fff','#f43f5e'];
+            const P=Array.from({length:130},()=>({x:innerWidth/2,y:innerHeight*.35,vx:(Math.random()-.5)*16,vy:-Math.random()*14-4,s:Math.random()*7+4,r:Math.random()*6,vr:(Math.random()-.5)*.4,c:cols[Math.random()*cols.length|0]}));
+            let f=0;(function loop(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.vy+=.35;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()});if(++f<220)requestAnimationFrame(loop);else x.clearRect(0,0,c.width,c.height)})();
+            const em=['💖','✨','🌸','💫','🎀'],box=document.getElementById('floaters');
+            for(let i=0;i<14;i++){const e=document.createElement('span');e.className='float';e.textContent=em[i%em.length];e.style.left=Math.random()*100+'vw';e.style.animationDuration=(7+Math.random()*7)+'s';e.style.animationDelay=(Math.random()*6)+'s';box.appendChild(e)}
+        })();
+
         if (typeof fbq !== 'undefined') { fbq('track', 'Lead'); }
 
         const SCRIPT_URL="https://script.google.com/macros/s/AKfycbyx0e3l93lN7UIzBc_klKgNhshT3496UJkjeKi4eQmuE46mIVkCppeqRTnTl6eijAAQOA/exec";
@@ -135,6 +217,7 @@
         function closeForm(){backdrop.classList.remove('show');formContainer.classList.remove('show');document.body.style.overflow='';setTimeout(()=>{mainForm.reset();msg.style.display='none';},300);}
 
         document.getElementById('openFormBtn').addEventListener('click',openForm);
+        document.getElementById('openFormBtn2').addEventListener('click',openForm);
         document.getElementById('closeFormBtn').addEventListener('click',closeForm);
         backdrop.addEventListener('click',closeForm);
         document.addEventListener('keydown',(e)=>{if(e.key==='Escape')closeForm();});
