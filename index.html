@@ -87,14 +87,12 @@
         .fq[open] summary::after{content:"⌃"}
         .fq p{padding:.2rem 1rem 1rem;font-size:.85rem;color:#444;margin:0}
 
-        /* TOP HERO HEADLINE */
         .hero{position:relative;z-index:2;width:100%;max-width:520px;text-align:center;background:linear-gradient(135deg,#fce4ec,#f9a8d4);border-radius:16px;padding:1.6rem 1rem 1.4rem;box-shadow:var(--shadow)}
         .hero-badge{display:inline-block;background:linear-gradient(135deg,#E91E63,#C2185B);color:#fff;font-size:.78rem;font-weight:800;letter-spacing:.4px;text-transform:uppercase;padding:.6rem 1.3rem;border-radius:50px;box-shadow:0 8px 20px rgba(233,30,99,.35);margin-bottom:1.1rem}
         .hero h1{font-family:'Playfair Display',serif;font-weight:800;color:#9d174d;font-size:2.3rem;line-height:1.1;margin:0 0 .7rem}
         .hero h1 span{font-size:1.4rem;color:#C2185B}
         .hero p{color:#9d174d;font-size:.95rem;margin:0}
 
-        /* BOTTOM FOOTER */
         .foot{position:relative;z-index:2;width:100%;max-width:520px;text-align:center;background:linear-gradient(135deg,#C2185B,#9d174d);color:#fff;border-radius:16px;padding:1.2rem 1rem 1.4rem;box-shadow:var(--shadow)}
         .foot-24{background:rgba(255,255,255,.14);border-radius:12px;padding:.8rem;margin-bottom:1.1rem}
         .foot-24 b{display:block;font-size:1rem;margin-bottom:.5rem}
@@ -239,7 +237,7 @@
             for(let i=0;i<14;i++){const e=document.createElement('span');e.className='float';e.textContent=em[i%em.length];e.style.left=Math.random()*100+'vw';e.style.animationDuration=(7+Math.random()*7)+'s';e.style.animationDelay=(Math.random()*6)+'s';box.appendChild(e)}
         })();
 
-        if (typeof fbq !== 'undefined') { fbq('track', 'Lead'); }
+        /* NOTE: Lead event ab page load par NAHI jata. Sirf form submit hone ke baad jayega. */
 
         const SCRIPT_URL="https://script.google.com/macros/s/AKfycbyL0f9aG3h6rwzeOhf-3SaJtqJ9-x59jdC7uuiSYVNI-V-r5496YwBQQ84t0wHWvPb3uQ/exec";
         const backdrop=document.getElementById('backdrop');
@@ -257,8 +255,10 @@
         backdrop.addEventListener('click',closeForm);
         document.addEventListener('keydown',(e)=>{if(e.key==='Escape')closeForm();});
 
-        mainForm.addEventListener('submit',(e)=>{
+        mainForm.addEventListener('submit',async (e)=>{
             e.preventDefault();
+            if(submitBtn.disabled) return; // double submit rokne ke liye
+
             const name=document.getElementById('inp_name').value.trim();
             const phone=document.getElementById('inp_phone').value.replace(/\D/g,'');
             const age=document.getElementById('inp_age').value;
@@ -268,20 +268,36 @@
 
             submitBtn.disabled=true;submitBtn.textContent='Submitting...';
 
+            const eventId='lead_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
             const fd=new FormData();
             fd.append('name',name);fd.append('phone',phone);fd.append('age',age);
             fd.append('gender',gender);fd.append('profession',profession);
             fd.append('source','Thank-You Page');fd.append('timestamp',new Date().toISOString());
+            fd.append('event_id',eventId);
 
-            const done=()=>{
-                submitBtn.disabled=false;submitBtn.textContent='✅ Submit Details';
+            // 3 baar try karega, tabhi success maanega jab request gayi ho
+            let ok=false;
+            for(let i=0;i<3&&!ok;i++){
+                try{
+                    const ctrl=new AbortController();
+                    const t=setTimeout(()=>ctrl.abort(),8000);
+                    await fetch(SCRIPT_URL,{method:'POST',body:fd,mode:'no-cors',signal:ctrl.signal});
+                    clearTimeout(t);
+                    ok=true;
+                }catch(err){
+                    await new Promise(r=>setTimeout(r,1000*(i+1)));
+                }
+            }
+
+            submitBtn.disabled=false;submitBtn.textContent='✅ Submit Details';
+
+            if(ok){
+                if(typeof fbq!=='undefined'){fbq('track','Lead',{},{eventID:eventId});} // Lead sirf submit ke baad
                 msg.style.display='block';
                 setTimeout(closeForm,1800);
-            };
-            let finished=false;
-            const once=()=>{if(finished)return;finished=true;done();};
-            fetch(SCRIPT_URL,{method:'POST',body:fd,mode:'no-cors'}).then(once).catch(once);
-            setTimeout(once,2500);
+            }else{
+                alert('Network issue. Please check your internet and try again.');
+            }
         });
     </script>
 </body>
